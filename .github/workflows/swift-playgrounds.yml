@@ -1,4 +1,4 @@
-name: Swift Playgrounds Test
+name: Run Swift Playgrounds
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
       - main  # Запускать при пуше в ветку main
 
 jobs:
-  run-swift-playgrounds:
-    runs-on: ubuntu-latest
+  run-playgrounds:
+    runs-on: macos-latest  # Используется macOS, так как требуется для Xcode
 
     steps:
     - name: Checkout repository
@@ -15,3 +15,5 @@ jobs:
 
     - name: Swift Playgrounds
       uses: thisIsTheFoxe/swift-playgrounds-action@v1
+      with:
+        project-path: test-app/test-app.xcodeproj  # Укажите путь к вашему .xcodeproj
