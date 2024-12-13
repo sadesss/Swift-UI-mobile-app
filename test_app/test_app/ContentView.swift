@@ -108,7 +108,7 @@ struct ContentView: View {
 
                     Spacer()
 
-                    NavigationLink(destination: CalendarView(tasks: tasks)) {
+                    NavigationLink(destination: CalendarView(tasks: $tasks)) {
                         Image(systemName: "calendar.circle.fill")
                             .foregroundColor(.pink)
                             .font(.largeTitle)
