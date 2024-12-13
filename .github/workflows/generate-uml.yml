@@ -1,0 +1,31 @@
+name: Generate UML Diagrams
+
+on:
+  push:
+    branches:
+      - main  # Выполнять при пушах в ветку main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y plantuml
+
+    - name: Generate UML Diagrams
+      run: |
+        mkdir -p diagrams
+        # Поиск всех .java файлов и генерация диаграмм
+        find . -name "*.java" | xargs plantuml -o diagrams
+
+    - name: Upload UML diagrams
+      uses: actions/upload-artifact@v3
+      with:
+        name: UML-Diagrams
+        path: diagrams
