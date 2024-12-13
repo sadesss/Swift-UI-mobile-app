@@ -1,41 +1,5 @@
-name: Generate UML Diagrams for Swift
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y plantuml
-        # Установка Swift и SwiftPlantUML
-        curl -sL https://swift.org/builds/swift-5.7.2-release/ubuntu2204/swift-5.7.2-RELEASE/swift-5.7.2-RELEASE-ubuntu22.04.tar.gz | tar xz -C /usr/local/
-        export PATH="/usr/local/swift-5.7.2-RELEASE-ubuntu22.04/usr/bin:$PATH"
-        git clone https://github.com/MarcoEidinger/SwiftPlantUML.git
-        cd SwiftPlantUML
-        swift build -c release
-        export PATH=$PATH:$(pwd)/.build/release
-
-    - name: Generate PlantUML input from Swift
-      run: |
-        mkdir -p diagrams
-        swiftplantuml ./test_app > diagrams/classes.puml
-
-    - name: Generate UML diagrams
-      run: |
-        plantuml diagrams/classes.puml -o diagrams
-
-    - name: Upload UML diagrams
-      uses: actions/upload-artifact@v3
-      with:
-        name: UML-Diagrams
-        path: diagrams
+            - name: Swift Playgrounds
+  # You may pin to the exact commit or the version.
+  # uses: thisIsTheFoxe/swift-playgrounds-action@2d53efdd21c398d1656f7c69ed81a8cca4730f18
+  uses: thisIsTheFoxe/swift-playgrounds-action@v1
+          
