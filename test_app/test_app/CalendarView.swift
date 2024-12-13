@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CalendarView: View {
-    var tasks: [Date: [Task]]
+    @Binding var tasks: [Date: [Task]]
     @State private var selectedDate: Date? = nil
     @State private var currentWeek: Date = Date()
 
@@ -33,7 +33,7 @@ struct CalendarView: View {
             .padding()
 
             HStack(spacing: 16) {
-                ForEach(daysInWeek(for: currentWeek), id: \ .self) { day in
+                ForEach(daysInWeek(for: currentWeek), id: \.self) { day in
                     let isToday = Calendar.current.isDateInToday(day)
                     let isSelected = selectedDate == Calendar.current.startOfDay(for: day)
 
@@ -64,14 +64,25 @@ struct CalendarView: View {
                         Text("Нет задач на этот день.")
                             .foregroundColor(.gray)
                     } else {
-                        ForEach(tasksForDate, id: \ .id) { task in
-                            VStack(alignment: .leading) {
-                                Text("• \(task.title)")
-                                    .fontWeight(.bold)
-                                Text(task.time)
-                                    .foregroundColor(.gray)
-                                Text("Описание: \(task.description)")
-                                Text("Место: \(task.location)")
+                        ForEach(tasksForDate, id: \.id) { task in
+                            HStack {
+                                VStack(alignment: .leading) {
+                                    Text("• \(task.title)")
+                                        .fontWeight(.bold)
+                                    Text(task.time)
+                                        .foregroundColor(.gray)
+                                    Text("Описание: \(task.description)")
+                                    Text("Место: \(task.location)")
+                                }
+
+                                Spacer()
+
+                                Button(action: {
+                                    deleteTask(task, for: selectedDate)
+                                }) {
+                                    Image(systemName: "trash")
+                                        .foregroundColor(.red)
+                                }
                             }
                             .padding(.bottom, 8)
                         }
@@ -129,15 +140,14 @@ struct CalendarView: View {
         return formatter.string(from: date)
     }
 
+    private func deleteTask(_ task: Task, for date: Date) {
+        guard let index = tasks[Calendar.current.startOfDay(for: date)]?.firstIndex(where: { $0.id == task.id }) else {
+            return
+        }
+        tasks[Calendar.current.startOfDay(for: date)]?.remove(at: index)
+    }
 }
 
-struct UserTask: Identifiable {
-    let id = UUID()
-    let title: String
-    let time: String
-    let description: String
-    let location: String
-}
 
 extension Color {
     static let customBrown = Color(red: 0.2, green: 0.1, blue: 0.2)
