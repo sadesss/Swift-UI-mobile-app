@@ -1,9 +1,9 @@
-name: Generate UML Diagrams
+name: Generate UML Diagrams for Swift
 
 on:
   push:
     branches:
-      - main  # Выполнять при пушах в ветку main
+      - main  # Выполнять workflow при пуше в ветку main
 
 jobs:
   build:
@@ -16,13 +16,13 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y plantuml
+        sudo apt-get install -y plantuml swift
+        mkdir -p diagrams
 
     - name: Generate UML Diagrams
       run: |
-        mkdir -p diagrams
-        # Поиск всех .java файлов и генерация диаграмм
-        find . -name "*.java" | xargs plantuml -o diagrams
+        # Используем PlantUML для обработки файлов Swift
+        find ./test_app -name "*.swift" | xargs plantuml -o diagrams
 
     - name: Upload UML diagrams
       uses: actions/upload-artifact@v3
