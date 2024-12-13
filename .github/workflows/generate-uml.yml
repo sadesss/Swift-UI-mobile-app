@@ -3,7 +3,7 @@ name: Generate UML Diagrams for Swift
 on:
   push:
     branches:
-      - main  # Выполнять workflow при пуше в ветку main
+      - main
 
 jobs:
   build:
@@ -16,13 +16,23 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y plantuml swift
-        mkdir -p diagrams
+        sudo apt-get install -y plantuml
+        # Установка Swift и SwiftPlantUML
+        curl -sL https://swift.org/builds/swift-5.7.2-release/ubuntu2204/swift-5.7.2-RELEASE/swift-5.7.2-RELEASE-ubuntu22.04.tar.gz | tar xz -C /usr/local/
+        export PATH="/usr/local/swift-5.7.2-RELEASE-ubuntu22.04/usr/bin:$PATH"
+        git clone https://github.com/MarcoEidinger/SwiftPlantUML.git
+        cd SwiftPlantUML
+        swift build -c release
+        export PATH=$PATH:$(pwd)/.build/release
 
-    - name: Generate UML Diagrams
+    - name: Generate PlantUML input from Swift
       run: |
-        # Используем PlantUML для обработки файлов Swift
-        find ./test_app -name "*.swift" | xargs plantuml -o diagrams
+        mkdir -p diagrams
+        swiftplantuml ./test_app > diagrams/classes.puml
+
+    - name: Generate UML diagrams
+      run: |
+        plantuml diagrams/classes.puml -o diagrams
 
     - name: Upload UML diagrams
       uses: actions/upload-artifact@v3
