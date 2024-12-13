@@ -1,5 +1,0 @@
-            - name: Swift Playgrounds
-  # You may pin to the exact commit or the version.
-  # uses: thisIsTheFoxe/swift-playgrounds-action@2d53efdd21c398d1656f7c69ed81a8cca4730f18
-  uses: thisIsTheFoxe/swift-playgrounds-action@v1
-          

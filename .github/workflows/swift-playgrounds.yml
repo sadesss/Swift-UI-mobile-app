@@ -1,0 +1,17 @@
+name: Swift Playgrounds Test
+
+on:
+  push:
+    branches:
+      - main  # Запускать при пуше в ветку main
+
+jobs:
+  run-swift-playgrounds:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Swift Playgrounds
+      uses: thisIsTheFoxe/swift-playgrounds-action@v1
