@@ -14,110 +14,23 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
-                // Текущий день и календарь
-                VStack(spacing: 8) {
-                    Text(currentDayAndDate())
-                        .font(.headline)
-                        .foregroundColor(.black)
-                    
+                CalendarSection(selectedDate: $selectedDate)
 
-                    HStack(spacing: 8) {
-                        ForEach(Weekday.allCases, id: \.self) { weekday in
-                            let isToday = Calendar.current.component(.weekday, from: Date()) == weekday.rawValue
+                WeeklyRecordsView(dailyRecords: $dailyRecords)
 
-                            
-                        }
-                    }
-                    //функция по выбору дня на начальной странице
-                    HStack(spacing: 8) {
-                        ForEach(daysInWeek(for: selectedDate), id: \.self) { day in
-                            let isToday = Calendar.current.isDateInToday(day)
-                            let isSelected = Calendar.current.isDate(day, inSameDayAs: selectedDate)
-
-                            Text(dayShortName(for: day))
-                                .fontWeight(.bold)
-                                .frame(width: 36, height: 36)
-                                .background(isToday ? Color.red : Color.gray.opacity(0.2))
-                                .foregroundColor(.black)
-                                .clipShape(Circle())
-                                .onTapGesture {
-                                    selectedDate = day // Обновляем выбранную дату
-                                }
-                        }
-                    }
-
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.white)
-                        .shadow(color: .gray.opacity(0.2), radius: 5, x: 0, y: 5)
-                )
-                .padding(.horizontal)
-
-                // Время за каждый день
-                VStack(alignment: .leading) {
-                    Text("Время, отработанное за неделю")
-                        .font(.headline)
-                        .foregroundColor(.black)
-
-                    if dailyRecords.isEmpty {
-                        Text("Нет отработанного времени за неделю.")
-                            .foregroundColor(.gray)
-                    } else {
-                        ForEach(dailyRecords) { record in
-                            HStack {
-                                Text(formattedDate(record.date))
-                                Spacer()
-                                Text(timeString(from: record.secondsWorked))
-                                    .foregroundColor(.black)
-                            }
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(Color.white)
-                        .shadow(color: .gray.opacity(0.3), radius: 5, x: 0, y: 5)
-                )
-                .padding(.horizontal)
-
-                // Раздел рабочего времени
                 WorkTimeView(
                     isTimerRunning: $isTimerRunning,
                     secondsToday: $secondsToday,
                     secondsThisWeek: Binding(
                         get: { dailyRecords.reduce(0) { $0 + $1.secondsWorked } },
-                        set: { _ in } // Временные данные записываются через обновление dailyRecords
+                        set: { _ in }
                     ),
                     currentWeekNumber: $currentWeekNumber
                 )
 
                 Spacer()
 
-                // Нижняя панель навигации
-                HStack {
-                    NavigationLink(destination: AddTaskView(tasks: $tasks)) {
-                        Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.pink)
-                            .font(.largeTitle)
-                    }
-
-                    Spacer()
-
-                    NavigationLink(destination: CalendarView(tasks: $tasks)) {
-                        Image(systemName: "calendar.circle.fill")
-                            .foregroundColor(.pink)
-                            .font(.largeTitle)
-                    }
-                }
-                .padding()
-                .background(Color.pink.opacity(0.1))
-                .cornerRadius(20)
-                .padding(.horizontal)
+                BottomNavigation(tasks: $tasks)
             }
             .background(Color.pink.opacity(0.1).edgesIgnoringSafeArea(.all))
             .onReceive(timer) { _ in
@@ -130,28 +43,7 @@ struct ContentView: View {
         }
     }
 
-    func currentDayAndDate() -> String {
-        let date = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ru_RU")
-        dateFormatter.dateFormat = "EEEE, d MMMM"
-        return dateFormatter.string(from: date).capitalized
-    }
-
-    func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMMM yyyy"
-        formatter.locale = Locale(identifier: "ru_RU")
-        return formatter.string(from: date)
-    }
-
-    func timeString(from seconds: Int) -> String {
-        let hours = seconds / 3600
-        let minutes = (seconds % 3600) / 60
-        let seconds = seconds % 60
-        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
-    }
-
+    // Вспомогательные функции для управления таймером и датами
     func saveDailyRecord(for date: Date, seconds: Int) {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: date)
@@ -185,19 +77,4 @@ struct ContentView: View {
         saveDailyRecord(for: Date(), seconds: secondsToday)
         secondsToday = 0
     }
-    func daysInWeek(for date: Date) -> [Date] {
-        let calendar = Calendar.current
-        guard let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: date)) else {
-            return []
-        }
-        return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: startOfWeek) }
-    }
-
-    func dayShortName(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
-        formatter.dateFormat = "EE"
-        return formatter.string(from: date)
-    }
-
 }
