@@ -42,7 +42,10 @@ struct BottomNavigation: View {
         .padding(.horizontal)
         .sheet(isPresented: $showShareSheet) {
             if let exportFileURL = exportFileURL {
-                ShareSheet(activityItems: [exportFileURL])
+                ShareSheet(activityItems: [exportFileURL], completion: {
+                    // После закрытия ShareSheet показываем сообщение об успешном экспорте
+                    showExportSuccessAlert = true
+                })
             }
         }
         .alert(isPresented: $showExportErrorAlert) {
@@ -60,13 +63,32 @@ struct BottomNavigation: View {
             return
         }
         
-        // Сохранение iCal файла во временную директорию
-        let tempDirectory = FileManager.default.temporaryDirectory
-        let icalFileURL = tempDirectory.appendingPathComponent("tasks_export.ics")
+        // Получение пути к Documents Directory
+        let fileManager = FileManager.default
+        let documentsDirectory: URL
+        do {
+            documentsDirectory = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+        } catch {
+            exportErrorMessage = "Не удалось найти директорию документов."
+            showExportErrorAlert = true
+            return
+        }
+        
+        let icalFileURL = documentsDirectory.appendingPathComponent("tasks_export.ics")
         
         do {
             try icalData.write(to: icalFileURL)
             print("iCal файл успешно сохранён по адресу: \(icalFileURL)")
+            
+            // Проверка существования файла
+            if fileManager.fileExists(atPath: icalFileURL.path) {
+                print("Файл iCal существует.")
+            } else {
+                print("Файл iCal не существует.")
+                exportErrorMessage = "Файл iCal не был создан."
+                showExportErrorAlert = true
+                return
+            }
             
             // Устанавливаем экспортированный файл
             self.exportFileURL = icalFileURL
