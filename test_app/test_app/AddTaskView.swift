@@ -1,4 +1,6 @@
+// AddTaskView.swift
 import SwiftUI
+import Foundation
 
 struct AddTaskView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -7,9 +9,10 @@ struct AddTaskView: View {
     @State private var title: String = ""
     @State private var description: String = ""
     @State private var location: String = ""
-    
+    @State private var category: CalendarCategory = .other  // Новое состояние для категории
+
     @Binding var tasks: [Date: [Task]]
-    
+
     var body: some View {
         NavigationView {
             Form {
@@ -17,13 +20,25 @@ struct AddTaskView: View {
                     DatePicker("Дата", selection: $selectedDate, displayedComponents: .date)
                     DatePicker("Время", selection: $selectedTime, displayedComponents: .hourAndMinute)
                 }
-                
+
                 Section(header: Text("Детали задачи")) {
                     TextField("Название", text: $title)
                     TextField("Описание", text: $description)
                     TextField("Место", text: $location)
+                    
+                    Picker("Календарь", selection: $category) {
+                        ForEach(CalendarCategory.allCases) { category in
+                            HStack {
+                                Circle()
+                                    .fill(category.color)
+                                    .frame(width: 10, height: 10)
+                                Text(category.rawValue)
+                            }
+                            .tag(category)
+                        }
+                    }
                 }
-                
+
                 Section {
                     Button(action: saveTask) {
                         Text("Сохранить задачу")
@@ -32,22 +47,17 @@ struct AddTaskView: View {
                 }
             }
             .navigationTitle("Новая задача")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Отмена") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-            }
+            
         }
     }
-    
+
     private func saveTask() {
         let task = Task(
             title: title,
             time: formattedTime(),
             description: description,
-            location: location
+            location: location,
+            category: category  // Устанавливаем категорию
         )
         let startOfDay = Calendar.current.startOfDay(for: selectedDate)
         if tasks[startOfDay] != nil {
@@ -57,18 +67,10 @@ struct AddTaskView: View {
         }
         presentationMode.wrappedValue.dismiss()
     }
-    
+
     private func formattedTime() -> String {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: selectedTime)
     }
-}
-
-struct Task: Identifiable {
-    let id = UUID()
-    let title: String
-    let time: String
-    let description: String
-    let location: String
 }
