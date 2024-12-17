@@ -14,6 +14,9 @@ struct CalendarView: View {
     @State private var editableTask: EditableTask? = nil  // Переменная для управления модальным окном
     @State private var selectedDate: Date? = nil  // Переменная для выбранной даты
 
+    // Добавлено для управления навигацией
+    @Environment(\.presentationMode) var presentationMode
+
     var body: some View {
         VStack(alignment: .leading) {
             weekNavigation
@@ -37,8 +40,25 @@ struct CalendarView: View {
             ))
         }
         .padding()
-        // Удаляем модификатор frame, чтобы избежать растягивания
         .background(Color.pink.opacity(0.1).edgesIgnoringSafeArea(.all))
+        // Скрываем стандартную кнопку "Back"
+        .navigationBarBackButtonHidden(true)
+        // Добавляем собственную кнопку "Назад"
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    // Закрываем текущее представление
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack {
+                        Image(systemName: "chevron.left") // Иконка стрелки назад (опционально)
+                            .foregroundColor(.blue) // Цвет иконки
+                        Text("Назад")
+                            .foregroundColor(.blue) // Цвет текста
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Week Navigation
@@ -110,7 +130,7 @@ struct CalendarView: View {
                                     Text(task.time).foregroundColor(.gray)
                                     Text("Описание: \(task.description)")
                                     Text("Место: \(task.location)")
-                                    
+
                                     // Добавляем метку категории
                                     HStack {
                                         Circle()
@@ -201,5 +221,11 @@ struct CalendarView: View {
         formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "d MMMM yyyy"
         return formatter.string(from: date)
+    }
+}
+
+struct CalendarView_Previews: PreviewProvider {
+    static var previews: some View {
+        CalendarView(tasks: .constant([:]))
     }
 }
