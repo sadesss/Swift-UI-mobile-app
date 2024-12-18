@@ -30,7 +30,6 @@ struct CalendarView: View {
                        let index = tasksForDay.firstIndex(where: { $0.id == editable.task.id }) {
                         return tasksForDay[index]
                     }
-                    // Возвращаем пустую задачу, если не найдена
                     return Task(title: "", time: "", description: "", location: "", category: .other, recurrenceRule: .none)
                 },
                 set: { newTask in
@@ -194,7 +193,6 @@ struct CalendarView: View {
         var resultTasks = [Task]()
         let startOfDay = Calendar.current.startOfDay(for: date)
         
-        // Добавляем задачи, назначенные непосредственно на эту дату
         if let tasksForDate = tasks[startOfDay] {
             resultTasks.append(contentsOf: tasksForDate)
         }
