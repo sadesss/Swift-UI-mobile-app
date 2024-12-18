@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct EditTaskView: View {
-    @Binding var task: Task  
+    @Binding var task: Task
 
     @Environment(\.presentationMode) var presentationMode
 
@@ -40,8 +40,12 @@ struct EditTaskView: View {
 
                 Section {
                     Button("Сохранить изменения") {
-                        presentationMode.wrappedValue.dismiss()
+                        // Дополнительная проверка: если задача дублированная, не сохраняем изменения
+                        if !task.title.contains(" (Повторение)") {
+                            presentationMode.wrappedValue.dismiss()
+                        }
                     }
+                    .disabled(task.title.contains(" (Повторение)")) // Отключаем кнопку, если задача дублированная
                 }
             }
             .navigationTitle("Редактирование задачи")

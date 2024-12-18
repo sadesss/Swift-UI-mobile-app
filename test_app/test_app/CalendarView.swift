@@ -148,7 +148,8 @@ struct CalendarView: View {
                                 Spacer()
 
                                 // Условное отображение кнопки редактирования
-                                if task.recurrenceRule != .none {
+                                // Отображается только для оригинальных задач (не дублированных)
+                                if !task.title.contains(" (Повторение)") {
                                     Button(action: {
                                         editableTask = EditableTask(date: selectedDate, task: task)
                                     }) {
