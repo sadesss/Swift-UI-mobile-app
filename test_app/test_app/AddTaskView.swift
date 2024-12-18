@@ -9,7 +9,8 @@ struct AddTaskView: View {
     @State private var title: String = ""
     @State private var description: String = ""
     @State private var location: String = ""
-    @State private var category: CalendarCategory = .other  // Новое состояние для категории
+    @State private var category: CalendarCategory = .other
+    @State private var recurrenceRule: RecurrenceRule = .none
 
     @Binding var tasks: [Date: [Task]]
 
@@ -26,7 +27,7 @@ struct AddTaskView: View {
                     TextField("Описание", text: $description)
                     TextField("Место", text: $location)
                     
-                    Picker("Календарь", selection: $category) {
+                    Picker("Категория", selection: $category) {
                         ForEach(CalendarCategory.allCases) { category in
                             HStack {
                                 Circle()
@@ -39,6 +40,15 @@ struct AddTaskView: View {
                     }
                 }
 
+                Section(header: Text("Повторение")) {
+                    Picker("Повторение", selection: $recurrenceRule) {
+                        ForEach(RecurrenceRule.allCases) { rule in
+                            Text(rule.rawValue).tag(rule)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                }
+
                 Section {
                     Button(action: saveTask) {
                         Text("Сохранить задачу")
@@ -47,7 +57,6 @@ struct AddTaskView: View {
                 }
             }
             .navigationTitle("Новая задача")
-            
         }
     }
 
@@ -57,7 +66,8 @@ struct AddTaskView: View {
             time: formattedTime(),
             description: description,
             location: location,
-            category: category  // Устанавливаем категорию
+            category: category,
+            recurrenceRule: recurrenceRule
         )
         let startOfDay = Calendar.current.startOfDay(for: selectedDate)
         if tasks[startOfDay] != nil {
@@ -72,5 +82,11 @@ struct AddTaskView: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: selectedTime)
+    }
+}
+
+struct AddTaskView_Previews: PreviewProvider {
+    static var previews: some View {
+        AddTaskView(tasks: .constant([Date(): [Task]()] ))
     }
 }

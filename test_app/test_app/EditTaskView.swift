@@ -2,7 +2,7 @@
 import SwiftUI
 
 struct EditTaskView: View {
-    @Binding var task: Task  // Привязка к редактируемой задаче
+    @Binding var task: Task  
 
     @Environment(\.presentationMode) var presentationMode
 
@@ -12,10 +12,11 @@ struct EditTaskView: View {
                 Section(header: Text("Редактировать задачу")) {
                     TextField("Название", text: $task.title)
                     TextField("Время", text: $task.time)
+                        .keyboardType(.numbersAndPunctuation)
                     TextField("Описание", text: $task.description)
                     TextField("Место", text: $task.location)
                     
-                    Picker("Календарь", selection: $task.category) {
+                    Picker("Категория", selection: $task.category) {
                         ForEach(CalendarCategory.allCases) { category in
                             HStack {
                                 Circle()
@@ -28,9 +29,18 @@ struct EditTaskView: View {
                     }
                 }
 
+                Section(header: Text("Повторение")) {
+                    Picker("Повторение", selection: $task.recurrenceRule) {
+                        ForEach(RecurrenceRule.allCases) { rule in
+                            Text(rule.rawValue).tag(rule)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                }
+
                 Section {
                     Button("Сохранить изменения") {
-                        presentationMode.wrappedValue.dismiss()  
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }
@@ -41,5 +51,11 @@ struct EditTaskView: View {
                 }
             )
         }
+    }
+}
+
+struct EditTaskView_Previews: PreviewProvider {
+    static var previews: some View {
+        EditTaskView(task: .constant(Task(title: "Пример", time: "10:00", description: "Описание", location: "Место", category: .work, recurrenceRule: .none)))
     }
 }

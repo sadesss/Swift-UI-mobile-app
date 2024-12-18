@@ -1,3 +1,4 @@
+//WeeklyRecord.swift
 import Foundation
 
 struct WeeklyRecord: Identifiable {

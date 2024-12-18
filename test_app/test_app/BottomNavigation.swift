@@ -43,7 +43,6 @@ struct BottomNavigation: View {
         .sheet(isPresented: $showShareSheet) {
             if let exportFileURL = exportFileURL {
                 ShareSheet(activityItems: [exportFileURL], completion: {
-                    // После закрытия ShareSheet показываем сообщение об успешном экспорте
                     showExportSuccessAlert = true
                 })
             }
@@ -90,14 +89,12 @@ struct BottomNavigation: View {
                 return
             }
             
-            // Устанавливаем экспортированный файл
             self.exportFileURL = icalFileURL
-            
-            // Отображаем ShareSheet с iCal файлом
+        
             showShareSheet = true
             
             // Показать сообщение об успешном экспорте после открытия ShareSheet
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { // Пауза для отображения ShareSheet
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 showExportSuccessAlert = true
             }
         } catch {

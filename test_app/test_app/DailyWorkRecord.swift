@@ -1,3 +1,4 @@
+//DailyWorkRecord.swift
 import Foundation
 
 struct DailyWorkRecord: Identifiable {

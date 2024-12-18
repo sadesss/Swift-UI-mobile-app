@@ -1,3 +1,4 @@
+// CalendarSection.swift
 import SwiftUI
 
 struct CalendarSection: View {
@@ -17,8 +18,8 @@ struct CalendarSection: View {
                     Text(dayShortName(for: day))
                         .fontWeight(.bold)
                         .frame(width: 36, height: 36)
-                        .background(isToday ? Color.red : Color.gray.opacity(0.2))
-                        .foregroundColor(.black)
+                        .background(isToday ? Color.red : (isSelected ? Color.blue : Color.gray.opacity(0.2)))
+                        .foregroundColor(isSelected || isToday ? .white : .black)
                         .clipShape(Circle())
                         .onTapGesture {
                             selectedDate = day
@@ -40,7 +41,7 @@ struct CalendarSection: View {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "EEEE, d MMMM"
-        return formatter.string(from: Date()).capitalized
+        return formatter.string(from: selectedDate).capitalized
     }
 
     func daysInWeek(for date: Date) -> [Date] {
@@ -56,5 +57,11 @@ struct CalendarSection: View {
         formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "EE"
         return formatter.string(from: date)
+    }
+}
+
+struct CalendarSection_Previews: PreviewProvider {
+    static var previews: some View {
+        CalendarSection(selectedDate: .constant(Date()))
     }
 }

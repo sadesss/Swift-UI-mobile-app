@@ -13,7 +13,6 @@ enum CalendarCategory: String, CaseIterable, Identifiable {
 
     var id: String { self.rawValue }
 
-    /// Цвет категории.
     var color: Color {
         switch self {
         case .work:
