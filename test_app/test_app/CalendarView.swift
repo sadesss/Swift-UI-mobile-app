@@ -30,6 +30,7 @@ struct CalendarView: View {
                        let index = tasksForDay.firstIndex(where: { $0.id == editable.task.id }) {
                         return tasksForDay[index]
                     }
+                    // Возвращаем пустую задачу, если не найдена
                     return Task(title: "", time: "", description: "", location: "", category: .other, recurrenceRule: .none)
                 },
                 set: { newTask in
@@ -147,10 +148,13 @@ struct CalendarView: View {
 
                                 Spacer()
 
-                                Button(action: {
-                                    editableTask = EditableTask(date: selectedDate, task: task)
-                                }) {
-                                    Image(systemName: "pencil").foregroundColor(.blue)
+                                // Условное отображение кнопки редактирования
+                                if task.recurrenceRule != .none {
+                                    Button(action: {
+                                        editableTask = EditableTask(date: selectedDate, task: task)
+                                    }) {
+                                        Image(systemName: "pencil").foregroundColor(.blue)
+                                    }
                                 }
 
                                 Button(action: {
@@ -206,7 +210,7 @@ struct CalendarView: View {
                         description: task.description,
                         location: task.location,
                         category: task.category,
-                        recurrenceRule: .none 
+                        recurrenceRule: .none
                     )
                     resultTasks.append(recurringTask)
                 }
